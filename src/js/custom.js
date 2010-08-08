@@ -1,4 +1,27 @@
 var Bup = {
+	templates : {
+		file :
+			'<div id="{{file_path}}" class="file_wrapper">'
+			+ '<table cellspacing="0">'
+			+ '<thead><tr><th colspan="2">{{name}}</th></tr></thead>' 
+			+ '<tbody>'
+
+			+ '{{#size}}'
+			+ 	'<tr><th>Size</th><td>{{size}}</td></tr>'
+			+ '{{/size}}'
+
+			+ '{{#permissions}}'
+			+ 	'<tr><th>Permissions</th><td>{{permissions}}</td></tr>'
+			+ '{{/permissions}}'
+
+			+ '{{#filetype}}'
+			+ 	'<tr><th>Filetype</th><td>{{filetype}}</td></tr>'
+			+ '{{/filetype}}'
+
+			+ '<tr><td colspan="2"><a href="#">Open file</a></tr>'
+			+ '</tbody></table></div>'
+	},
+
 	getDirectory: function (path) {
 		if (Bup_Data && Bup_Data.directories) {
 			return Bup_Data.directories[path];
@@ -38,19 +61,14 @@ var Bup = {
 			var permissions = (file.permissions) ? file.permissions : '';
 			var filetype = (file.filetype) ? file.filetype : '';
 
-			var result = '<div id="' + file_path + '" class="file_wrapper"><table cellspacing="0"><thead><tr><th colspan="2">' + name +'</th></tr></thead><tbody>';
-			if (size) {
-				result += '<tr><th>Size</th><td>' + size + '</td></tr>';
+			var file_data = {
+				'file_path' : file_path,
+				'name' : name,
+				'size' : size,
+				'permissions' : permissions,
+				'filetype' : filetype
 			}
-			if (permissions) {
-				result += '<tr><th>Permissions</th><td>' + permissions + '</td></tr>';
-			}
-			if (filetype) {
-				result += '<tr><th>Filetype</th><td>' + filetype + '</td></tr>';
-			}
-			result += '<tr><td colspan="2"><a href="#">Open file</a></tr>';
-			result += '</tbody></table></div>';
-			return result;
+			return Mustache.to_html(this.templates.file, file_data);
 		}
 	},
 
