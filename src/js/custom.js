@@ -5,10 +5,11 @@ var Bup = {
 		}
 	},
 
-	renderDirectory: function (directory_path, active_path) {
+	renderDirectory: function (directory_path) {
 		var directory = this.getDirectory(directory_path);
 		if (Bup_Data && Bup_Data.fs) {
-			var result = '<table cellspacing="0"><thead><tr><th>Filetype</th><th>Size</th></tr></thead><tbody>';
+			var margin_left = ((directory_path.split('/').length - 1) * 501);
+			var result = '<div id="' + directory_path + '" class="directory_wrapper"><table cellspacing="0"><thead><tr><th>Filetype</th><th>Size</th></tr></thead><tbody>';
 			$(directory).each(function() {
 				if (Bup_Data.fs[this]) {
 					var name_array = this.split('/');
@@ -17,13 +18,13 @@ var Bup = {
 					var type = Bup_Data.fs[this].type;
 
 					if (type == 'directory') {
-						result += '<tr class="directory' + ((active_path == this) ? ' active' : '') + '"><td><a href="#" data-path="' + this + '">' + name + '</a></td><td>&nbsp;</td>';
+						result += '<tr class="directory"><td><a href="#" data-path="' + this + '">' + name + '</a></td><td>&nbsp;</td>';
 					} else if (type == 'file') {
 						result += '<tr class="file"><td><a href="#" data-path="' + this + '">' + name + '</a></td><td>' + Bup_Data.fs[this].size + '</td>';
 					}
 				}
 			});
-			result += '</tbody> </table>';
+			result += '</tbody></table></div>';
 			return result;
 		}
 	},
@@ -37,7 +38,7 @@ var Bup = {
 			var permissions = (file.permissions) ? file.permissions : '';
 			var filetype = (file.filetype) ? file.filetype : '';
 
-			var result = '<table cellspacing="0"><thead><tr><th colspan="2">' + name +'</th></tr></thead><tbody>';
+			var result = '<div id="' + file_path + '" class="file_wrapper"><table cellspacing="0"><thead><tr><th colspan="2">' + name +'</th></tr></thead><tbody>';
 			if (size) {
 				result += '<tr><th>Size</th><td>' + size + '</td></tr>';
 			}
@@ -48,42 +49,52 @@ var Bup = {
 				result += '<tr><th>Filetype</th><td>' + filetype + '</td></tr>';
 			}
 			result += '<tr><td colspan="2"><a href="#">Open file</a></tr>';
-			result += '</tbody></table>';
+			result += '</tbody></table></div>';
 			return result;
 		}
 	},
 
 	showDirectory: function (directory_path) {
-		// clear shown file
-		$('#col3').html('&nbsp;');
+		$('#directories').children().each(function () {
+			var id = $(this).attr('id');
+			if (id != 'clearing') {
+				if (!directory_path.match('^' + id) || directory_path == id) {
+					$(this).remove();
+				}
+			}
+		});
 
-		var path_array = directory_path.split('/');
-		if (directory_path == '/') {
-			$('#col1').html('&nbsp;');
-		} else if (path_array.length == 2) {
-			$('#col1').html(this.renderDirectory('/', directory_path));
-		} else {
-			path_array.pop();
-			$('#col1').html(this.renderDirectory(path_array.join('/', directory_path)));
-		}
-		$('#col2').html(this.renderDirectory(directory_path, ''));
+		$('#directories #clearing').before(this.renderDirectory(directory_path));
+		this.resizeDirectories();
+
 		$('#breadcrumb').html(this.renderBreadcrumb(directory_path));
+		this.highlightPath(directory_path);
+	},
+
+	resizeDirectories: function () {
+		var max_height = 0;
+		var directories = $('#directories');
+		directories.children().each(function () {
+			if ($(this).height() > max_height) {
+				max_height = $(this).height();
+			}
+		});
+		directories.children().each(function () {
+			if ($(this).attr('id') != 'clearing') {
+				$(this).height(max_height);
+			}
+		});
+		directories.height(max_height);
+		directories.width((directories.children().length - 1) * 501);
 	},
 
 	showFile: function (file_path) {
 		var path_array = file_path.split('/');
 		path_array.pop();
-		if (path_array.length > 1) {
-			$('#col2').html(this.renderDirectory(path_array.join('/'), path_array.join('/')));
+		$('#directories #clearing').before($(this.renderFile(file_path)));
 
-			path_array.pop();
-			if (path_array.length > 1) {
-				$('#col1').html(this.renderDirectory(path_array.join('/'), path_array.join('/')));
-			}
-		} else {
-			$('#col2').html(this.renderDirectory('/', ''));
-		}
-		$('#col3').html(this.renderFile(file_path));
+		this.resizeDirectories();
+		this.highlightPath(file_path);
 	},
 
 	renderBreadcrumb: function (path) {
@@ -98,20 +109,35 @@ var Bup = {
 		}
 		html += ' / <strong>' + path_array[path_array.length-1] + '</strong>';
 		return html;
+	},
+
+	highlightPath: function (path) {
+		$('#directories').children().each(function () {
+			var id = $(this).attr('id');
+			if (id != 'clearing') {
+				$(this).find('tbody tr').each(function () {
+					var currentpath = $(this).find('a').attr('data-path');
+					if (path.match('^' + currentpath)) {
+						$(this).addClass('active');
+					} else {
+						$(this).removeClass('active');
+					}
+				});
+			}
+		});
 	}
 }
 
 $(function () {
-	$('#col2').html(Bup.renderDirectory('/', ''));
 	Bup.showDirectory('/');
 
-	$('#col1 .directory a, #col2 .directory a').live('click', function() {
+	$('#directories .directory a').live('click', function() {
 		var path = $(this).attr('data-path');
 		Bup.showDirectory(path);
 		return false;
 	});
 
-	$('#col2 .file a').live('click', function() {
+	$('#directories .file a').live('click', function() {
 		var path = $(this).attr('data-path');
 		Bup.showFile(path);
 		return false;

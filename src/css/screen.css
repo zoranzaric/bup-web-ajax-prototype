@@ -1,12 +1,16 @@
 * { outline: none; }
 body { font-family: Arial, Helvetica, sans-serif; }
-table { width: 100%; padding: 5%; }
+table { width: 100%; padding: 0 5%; }
 
 a { color: black; text-decoration: none; }
 a:hover { text-decoration: underline; }
 
 #wrapper { margin: 20px; width: 100%; }
-#col1, #col2, #col3 { width: 30%; float: left; }
-#col3 tbody th, #col3 tbody td { text-align: left; }
+#directories_wrapper { width: 100%; overflow: auto; }
+#directories>div { width: 500px; float: left; border-left: 1px solid black; }
+
+.file_wrapper tbody th { text-align: left; }
 
 tr.active { background: #cccccc;}
+
+.clearing { clear: both; }
