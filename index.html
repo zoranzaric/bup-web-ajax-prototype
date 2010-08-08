@@ -1,0 +1,89 @@
+<!DOCTYPE HTML>
+<html>
+	<head>
+		<script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.4.2/jquery.min.js"></script>
+		<script type="text/javascript" src="src/js/custom.js"></script>
+		<script type="text/javascript">
+			var Bup_Data = {
+				directories : {
+					'/' : [
+						'/etc',
+						'/home',
+						'/var',
+						'/usr'
+					],
+					'/etc' : [
+						'/etc/passwd'
+					],
+					'/home' : [
+						'/home/testuser1',
+						'/home/testuser2'
+					],
+					'/home/testuser1' : [
+						'/home/testuser1/foo'
+					],
+					'/home/testuser2' : [
+						'/home/testuser2/bar'
+					],
+					'/var' : [],
+					'/usr' : []
+				},
+				fs : {
+					'/': {
+						type: 'directory'
+					},
+					'/etc': {
+						type: 'directory'
+					},
+					'/etc/passwd' : {
+						type: 'file',
+						size: '1337',
+						permissions: '777',
+						filetype: 'text'
+					},
+					'/home': {
+						type: 'directory'
+					},
+					'/home/testuser1' : {
+						type: 'directory'
+					},
+					'/home/testuser1/foo' : {
+						type: 'file',
+						size: '1337',
+						permissions: '777',
+						filetype: 'text'
+					},
+					'/home/testuser2' : {
+						type: 'directory'
+					},
+					'/home/testuser2/bar' : {
+						type: 'file',
+						size: '1337',
+						permissions: '777',
+						filetype: 'text'
+					},
+					'/var': {
+						type: 'directory'
+					},
+					'/usr': {
+						type: 'directory'
+					}
+				}
+			}
+		</script>
+		<link rel="stylesheet" href="src/css/screen.css" />
+	</head>
+	<body>
+		<div id="wrapper">
+			<div id="breadcrumb">
+				<a href="#">[root]</a> /
+				<a href="#">etc</a> /
+				<a href="#">apache2</a> /
+				<strong>conf.d</strong>
+			</div>
+			<div id="col1">&nbsp;</div>
+			<div id="col2">&nbsp;</div>
+			<div id="col3">&nbsp;</div>
+		</div>
+	</body>
+</html>

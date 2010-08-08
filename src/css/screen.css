@@ -1,0 +1,12 @@
+* { outline: none; }
+body { font-family: Arial, Helvetica, sans-serif; }
+table { width: 100%; padding: 5%; }
+
+a { color: black; text-decoration: none; }
+a:hover { text-decoration: underline; }
+
+#wrapper { margin: 20px; width: 100%; }
+#col1, #col2, #col3 { width: 30%; float: left; }
+#col3 tbody th, #col3 tbody td { text-align: left; }
+
+tr.active { background: #cccccc;}
