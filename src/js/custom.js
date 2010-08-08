@@ -19,7 +19,39 @@ var Bup = {
 			+ '{{/filetype}}'
 
 			+ '<tr><td colspan="2"><a href="#">Open file</a></tr>'
-			+ '</tbody></table></div>'
+			+ '</tbody></table></div>',
+
+		//TODO make this use a parital
+		directory :
+			'<div id="{{path}}" class="directory_wrapper">'
+			+ '<table cellspacing="0">'
+			+ '<thead><tr><th>Filetype</th><th>Size</th></tr></thead>'
+			+ '<tbody>'
+
+			+ '{{#rows}}'
+			+	'{{{.}}}'
+			+ '{{/rows}}'
+
+			+ '</tbody>'
+			+ '</table></div>',
+
+		//TODO make this use a parital
+		directory_row_directory :
+			'<tr class="directory"><td>'
+			+ '<a href="#" data-path="{{path}}">'
+			+ '{{name}}'
+			+ '</a>'
+			+ '</td>'
+			+ '<td>&nbsp;</td>',
+
+		//TODO make this use a parital
+		directory_row_file :
+			'<tr class="file"><td>'
+			+ '<a href="#" data-path="{{path}}">'
+			+ '{{name}}'
+			+ '</a>'
+			+ '</td>'
+			+ '<td>{{size}}</td>'
 	},
 
 	getDirectory: function (path) {
@@ -32,7 +64,7 @@ var Bup = {
 		var directory = this.getDirectory(directory_path);
 		if (Bup_Data && Bup_Data.fs) {
 			var margin_left = ((directory_path.split('/').length - 1) * 501);
-			var result = '<div id="' + directory_path + '" class="directory_wrapper"><table cellspacing="0"><thead><tr><th>Filetype</th><th>Size</th></tr></thead><tbody>';
+			var directory_rows = [];
 			$(directory).each(function() {
 				if (Bup_Data.fs[this]) {
 					var name_array = this.split('/');
@@ -41,14 +73,31 @@ var Bup = {
 					var type = Bup_Data.fs[this].type;
 
 					if (type == 'directory') {
-						result += '<tr class="directory"><td><a href="#" data-path="' + this + '">' + name + '</a></td><td>&nbsp;</td>';
+						var row_data = {
+							'path' : this,
+							'name' : name
+						}
+						directory_rows.push(
+							Mustache.to_html(Bup.templates.directory_row_directory, row_data)
+						);
 					} else if (type == 'file') {
-						result += '<tr class="file"><td><a href="#" data-path="' + this + '">' + name + '</a></td><td>' + Bup_Data.fs[this].size + '</td>';
+						var row_data = {
+							'path' : this,
+							'name' : name,
+							'size' : Bup_Data.fs[this].size
+						}
+						directory_rows.push(
+							Mustache.to_html(Bup.templates.directory_row_file, row_data)
+						);
 					}
 				}
 			});
-			result += '</tbody></table></div>';
-			return result;
+			var directory_data = {
+				'path' : directory_path,
+				'rows' : directory_rows
+			}
+			//TODO make this use a parital
+			return Mustache.to_html(this.templates.directory, directory_data);
 		}
 	},
 
